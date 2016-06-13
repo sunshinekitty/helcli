@@ -23,6 +23,12 @@ try:
 except ImportError:
     pass
 
+with open("VERSION", "rt") as vfile:
+    version = vfile.readline()
+
 setuptools.setup(
+    version=version,
     setup_requires=['pbr>=1.8'],
     pbr=True)
+
+# vim:et:fdm=marker:sts=4:sw=4:ts=4
