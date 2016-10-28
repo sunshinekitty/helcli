@@ -13,14 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from helcli.config import get_config
 from helcli.parser import get_parser, gen_parser
 import importlib
 import inspect
 
 
 class HelCLI(object):
-    def __init__(self, sub_commands, description=None, config_files=None):
+    def __init__(self, sub_commands, description=None, *additional_args):
         """
         :param description: A description of your CLI
         :type description: str
@@ -30,7 +29,7 @@ class HelCLI(object):
         :type config_files: list(str)
         """
         self._sub_commands = sub_commands
-        self._config = get_config(config_files)
+        self._additional_args = additional_args
         self._parser, self._subparser = get_parser(description)
 
     def run(self):
@@ -39,7 +38,7 @@ class HelCLI(object):
         gen_parser(caller, self._sub_commands, self._parser, self._subparser)
         parser_dict = vars(self._parser.parse_args())
         self._run_command(caller, self._sub_commands, parser_dict['command'],
-                          parser_dict, self._config)
+                          parser_dict, self._additional_args)
 
     @staticmethod
     def _caller_module():
@@ -47,7 +46,7 @@ class HelCLI(object):
         :returns: Calling module of this module
         :rtype: string
         """
-        # < 3.3 implementation is cosidered a hack for inspecting the frame
+        # cosidered a hack for inspecting the frame
         stack = inspect.stack()
         # [2] who calls this guys caller
         parentframe = stack[2][0]
@@ -58,7 +57,7 @@ class HelCLI(object):
         return module.__name__  # A base module is calling
 
     @staticmethod
-    def _run_command(caller, commands, command, parser, config):
+    def _run_command(caller, commands, command, parser, additional_args):
         """
         Run the main function in given command module
         :param caller: Module calling this module
@@ -74,6 +73,6 @@ class HelCLI(object):
         """
         command_module = importlib.import_module(
             '{}.{}.{}'.format(caller, commands, command))
-        command_module.main(parser, config)
+        command_module.main(parser, additional_args)
 
 # vim:et:fdm=marker:sts=4:sw=4:ts=4

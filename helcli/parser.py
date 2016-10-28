@@ -43,11 +43,12 @@ def gen_parser(caller, commands, parser, subparsers):
     :param subparsers: Subparsers object
     :type subparsers: argparse._SubParsersAction
     """
-    importlib.import_module('{}.{}'.format(caller, commands))
+    package = importlib.import_module('{}.{}'.format(caller, commands))
     for importer, modname, ispkg in \
-            pkgutil.iter_modules('{}.{}'.format(caller, commands)):
-        found_module = importlib.import_module(
-            '{}.{}.{}'.format(caller, commands, modname))
-        found_module.setup(parser, subparsers)
+            pkgutil.iter_modules(package.__path__,
+                                 prefix='{}.{}.'.format(caller, commands)):
+        if not ispkg:
+            found_module = importlib.import_module('{}'.format(modname))
+            found_module.setup(parser, subparsers)
 
 # vim:et:fdm=marker:sts=4:sw=4:ts=4
