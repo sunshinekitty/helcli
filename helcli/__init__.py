@@ -16,6 +16,7 @@
 from helcli.parser import get_parser, gen_parser
 import importlib
 import inspect
+import sys
 
 
 class HelCLI(object):
@@ -37,6 +38,9 @@ class HelCLI(object):
         caller = self._caller_module()
         gen_parser(caller, self._sub_commands, self._parser, self._subparser)
         parser_dict = vars(self._parser.parse_args())
+        if not parser_dict['command']:
+            self._parser.print_help()
+            sys.exit(1)
         self._run_command(caller, self._sub_commands, parser_dict['command'],
                           parser_dict, self._additional_args)
 
