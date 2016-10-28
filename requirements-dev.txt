@@ -1,0 +1,7 @@
+-r requirements.txt
+-r requirements-testing.txt
+
+# Documentation
+sphinx==1.4.8 # PSF-2.0
+sphinx-autobuild==0.6.0 # MIT
+sphinx_rtd_theme # MIT
